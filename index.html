@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Night Fury 360 Experience</title>
+    <style>
+        body {
+            margin: 0;
+            background: #02050a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Helvetica', sans-serif;
+        }
+
+        /* The Green Glowing Platform */
+        .platform {
+            position: absolute;
+            width: 600px;
+            height: 180px;
+            background: radial-gradient(ellipse, rgba(153, 255, 0, 0.2) 0%, transparent 75%);
+            border-bottom: 5px solid #99ff00;
+            border-radius: 50%;
+            bottom: 15%;
+            filter: blur(8px);
+            z-index: 1;
+            box-shadow: 0 10px 50px rgba(153, 255, 0, 0.3);
+        }
+
+        /* The Dragon Container */
+        #dragon-container {
+            position: relative;
+            z-index: 2;
+            cursor: grab;
+            transition: transform 0.1s ease-out;
+        }
+
+        #dragon-container:active { cursor: grabbing; }
+
+        .dragon-img {
+            max-width: 800px;
+            height: auto;
+            /* This filter mimics the "Reptilian" sharpness and shadow depth */
+            filter: contrast(1.2) brightness(1.1) drop-shadow(0 0 30px #000);
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        /* Plasma Blast Animation */
+        .plasma {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            width: 10px;
+            height: 10px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 40px 20px #00d4ff, 0 0 100px 50px #0055ff;
+            opacity: 0;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+        }
+
+        .firing {
+            animation: plasma-shot 0.5s ease-out;
+        }
+
+        @keyframes plasma-shot {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(40); opacity: 0; }
+        }
+
+        .ui-text {
+            position: absolute;
+            bottom: 5%;
+            color: #99ff00;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            font-size: 14px;
+            text-shadow: 0 0 10px #99ff00;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="platform"></div>
+    
+    <div id="dragon-container">
+        <img id="dragon" img src="toothless.png" class="dragon-img" alt="Night Fury">
+        <div id="plasma-ball" class="plasma"></div>
+    </div>
+
+    <div class="ui-text">Drag to Rotate | Double-Click to Fire</div>
+
+    <script>
+        const dragon = document.getElementById('dragon-container');
+        const plasma = document.getElementById('plasma-ball');
+        let rotation = 0;
+        let isDragging = false;
+        let startX;
+
+        // 1. 360-degree 'Viewing' Logic
+        // Since we are using one image, we rotate it in 3D space to simulate the turn
+        window.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.pageX;
+        });
+
+        window.addEventListener('mouseup', () => isDragging = false);
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const mouseMove = e.pageX - startX;
+            rotation += mouseMove * 0.5;
+            dragon.style.transform = `rotateY(${rotation}deg)`;
+            startX = e.pageX;
+        });
+
+        // 2. Plasma Blast Logic
+        window.addEventListener('dblclick', () => {
+            plasma.classList.add('firing');
+            setTimeout(() => {
+                plasma.classList.remove('firing');
+            }, 500);
+            
+            // Subtle shake effect on fire
+            dragon.style.transform += ' scale(1.1)';
+            setTimeout(() => {
+                dragon.style.transform = `rotateY(${rotation}deg)`;
+            }, 100);
+        });
+    </script>
+</body>
+</html>
